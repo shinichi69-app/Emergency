@@ -154,3 +154,76 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. เรียกทำงาน GPS ตามหลัง
   getLocation();
 });
+// --- 7. PWA Automatic Install Prompt Handling ---
+let deferredPrompt = null;
+
+// ตรวจสอบว่าเป็น iOS หรือไม่
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+// ตรวจสอบว่าแอปถูกติดตั้งไปแล้วหรือยัง (In Standalone Mode)
+function isAppInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+// ดักจับ Event ก่อนที่ Browser จะโชว์ Banner หลัก
+window.addEventListener('beforeinstallprompt', (e) => {
+  // ป้องกันไม่ให้ Browser ขึ้น Banner ดั้งเดิมอัตโนมัติ
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // ตรวจสอบว่าถ้ายังไม่ได้ติดตั้ง และยังไม่ได้กดปิดไปในรอบนี้ ให้โชว์ Pop-up ของเรา
+  if (!isAppInstalled() && !sessionStorage.getItem('pwaModalDismissed')) {
+    setTimeout(() => {
+      showInstallModal();
+    }, 1500); // ดีเลย์ 1.5 วินาทีหลังเปิดหน้าเว็บเพื่อให้ดูนุ่มนวล
+  }
+});
+
+// แสดง Pop-up Modal
+function showInstallModal() {
+  const modal = document.getElementById('pwaInstallModal');
+  const iosGuide = document.getElementById('iosInstallGuide');
+  const androidAction = document.getElementById('androidInstallAction');
+
+  if (!modal) return;
+
+  if (isIOS()) {
+    // ถ้าเป็น iOS ให้ซ่อนปุ่มกดติดตั้ง แล้วแสดงวิธีทำผ่าน Safari แทน
+    if (iosGuide) iosGuide.classList.remove('hidden');
+    if (androidAction) androidAction.classList.add('hidden');
+  }
+
+  modal.classList.remove('hidden');
+}
+
+// เมื่อผู้ใช้กดปุ่ม "ติดตั้งแอปทันที" บน Pop-up
+async function triggerPwaInstall() {
+  if (deferredPrompt) {
+    // เรียก Pop-up ติดตั้งของ OS ขึ้นมา
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    
+    console.log(`User response to the install prompt: ${outcome}`);
+    deferredPrompt = null;
+    closeInstallModal();
+  }
+}
+
+// ปิด Pop-up Modal
+function closeInstallModal() {
+  const modal = document.getElementById('pwaInstallModal');
+  if (modal) modal.classList.add('hidden');
+  // บันทึกไว้ใน Session ว่าปิดแล้ว จะได้ไม่ขึ้นกวนใจซ้ำในการเข้าเว็บครั้งนี้
+  sessionStorage.setItem('pwaModalDismissed', 'true');
+}
+
+// ตรวจสอบกรณี iOS (เนื่องจากไม่มี event beforeinstallprompt)
+document.addEventListener('DOMContentLoaded', () => {
+  if (isIOS() && !isAppInstalled() && !sessionStorage.getItem('pwaModalDismissed')) {
+    setTimeout(() => {
+      showInstallModal();
+    }, 2000);
+  }
+});
