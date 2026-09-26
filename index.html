@@ -68,5 +68,43 @@
 
     <!-- นำเข้า Logic หลัก -->
     <script src="app.js"></script>
+    
+<!-- PWA Install Pop-up Modal -->
+    <div id="pwaInstallModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4 hidden transition-opacity duration-300">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl transform transition-all space-y-4 text-center">
+            
+            <!-- App Icon & Header -->
+            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto text-red-600 text-2xl shadow-inner">
+                <i class="fa-solid fa-phone-volume animate-bounce"></i>
+            </div>
+            
+            <div>
+                <h3 class="text-lg font-bold text-gray-800">ติดตั้งแอป "ฉุกเฉิน TH"</h3>
+                <p class="text-xs text-gray-500 mt-1">ติดตั้งลงบนมือถือเพื่อกดโทรออกด่วน และเข้าถึงพิกัด GPS ได้แม้น้ำเน็ตหลุด (Offline)</p>
+            </div>
+
+            <!-- คำแนะนำสำหรับ iOS Safari (จะแสดงผลเฉพาะบน iPhone/iPad) -->
+            <div id="iosInstallGuide" class="hidden bg-gray-50 p-3 rounded-xl text-left text-xs text-gray-600 space-y-1.5 border border-gray-200">
+                <p class="font-semibold text-gray-800">📲 วิธีติดตั้งบน iPhone / iPad:</p>
+                <ol class="list-decimal list-inside space-y-1">
+                    <li>กดปุ่ม <span class="font-bold text-blue-600"><i class="fa-solid fa-share-nodes"></i> แชร์ (Share)</span> ที่แถบ Safari ด้านล่าง</li>
+                    <li>เลื่อนลงมาแล้วเลือก <span class="font-bold text-gray-800"><i class="fa-regular fa-square-plus"></i> เพิ่มไปยังหน้าจอโฮม</span></li>
+                </ol>
+            </div>
+
+            <!-- ปุ่มดำเนินการสำหรับ Android / Desktop -->
+            <div id="androidInstallAction" class="space-y-2">
+                <button onclick="triggerPwaInstall()" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 active:scale-95 transition flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-download"></i> ติดตั้งแอปทันที
+                </button>
+            </div>
+
+            <!-- ปุ่มปิด Pop-up -->
+            <button onclick="closeInstallModal()" class="text-xs text-gray-400 hover:text-gray-600 underline font-medium">
+                ไว้ทีหลัง / ปิดหน้าต่างนี้
+            </button>
+        </div>
+    </div>
+    
 </body>
 </html>
