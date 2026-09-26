@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เบอร์โทรฉุกเฉิน Thailand (PWA)</title>
+    <!-- Manifest สำหรับ PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#dc2626">
+    
+    <!-- External Resources -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="pb-12">
+
+    <!-- Header & Search -->
+    <header class="bg-red-600 text-white py-6 px-4 shadow-lg sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto text-center">
+            <h1 class="text-2xl font-bold flex items-center justify-center gap-2">
+                <i class="fa-solid fa-phone-volume animate-pulse"></i> เบอร์โทรฉุกเฉิน Thailand
+            </h1>
+            <p class="text-red-100 text-xs mt-1">กดโทรออกได้ทันที รองรับการทำงานออฟไลน์</p>
+            
+            <div class="mt-4 relative">
+                <input type="text" id="searchInput" onkeyup="filterContacts()" 
+                       placeholder="ค้นหาบริการฉุกเฉิน..." 
+                       class="w-full py-2 px-10 rounded-full text-gray-800 text-sm focus:outline-none shadow">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3 text-gray-400"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 mt-4 space-y-4">
+
+        <!-- 📍 GPS Location Widget (สำคัญมากสำหรับกรณีแจ้งเหตุ) -->
+        <section class="bg-white p-4 rounded-xl shadow-sm border border-red-200">
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="font-bold text-gray-800 flex items-center gap-2 text-sm sm:text-base">
+                    <i class="fa-solid fa-location-dot text-red-600"></i> ตำแหน่งปัจจุบันของคุณ
+                </h2>
+                <button onclick="getLocation()" class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full font-medium hover:bg-red-100 transition">
+                    <i class="fa-solid fa-rotate-right"></i> อัปเดตตำแหน่ง
+                </button>
+            </div>
+            
+            <!-- แสดงผลพิกัด -->
+            <div id="locationBox" class="bg-gray-50 p-3 rounded-lg text-xs sm:text-sm text-gray-600 space-y-1">
+                <p id="geoStatus">กำลังดึงตำแหน่ง GPS...</p>
+                <p id="geoCoords" class="font-mono font-bold text-gray-800 hidden"></p>
+            </div>
+
+            <!-- ปุ่มก๊อปปี้ข้อความเพื่อแจ้งเจ้าหน้าที่ -->
+            <button id="copyBtn" onclick="copyLocationText()" class="hidden w-full mt-2 bg-gray-800 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-2 hover:bg-gray-900 transition">
+                <i class="fa-solid fa-copy"></i> คัดลอกพิกัดตำแหน่งเพื่อส่ง/อ่านให้เจ้าหน้าที่
+            </button>
+        </section>
+
+        <!-- Container สำหรับ Render รายการเบอร์โทรจาก JSON -->
+        <div id="contactsContainer" class="space-y-6"></div>
+
+    </main>
+
+    <!-- นำเข้า Logic หลัก -->
+    <script src="app.js"></script>
+</body>
+</html>
