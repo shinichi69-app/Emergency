@@ -1,0 +1,21 @@
+{
+  "name": "เบอร์โทรฉุกเฉิน Thailand",
+  "short_name": "ฉุกเฉิน TH",
+  "description": "รวมเบอร์โทรและช่องทางติดต่อฉุกเฉินในประเทศไทย กดโทรออกได้ทันที",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#dc2626",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1033/1033092.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1033/1033092.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
