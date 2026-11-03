@@ -1,29 +1,40 @@
 const CACHE_NAME = 'emergency-th-v1';
-// รายการไฟล์ที่ต้องการให้เปิดได้แม้น้ำเน็ตหลุด (Offline)
-const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './app.js',
-  './contacts.json',
-  './manifest.json',
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/app.js',
+  '/manifest.json',
   'https://cdn.tailwindcss.com',
+  'https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
 
-// ขั้นตอน Install: ทำการ Cache ไฟล์ทั้งหมด
+// ติดตั้ง Service Worker และแคชไฟล์ที่จำเป็น
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
   );
 });
 
-// ขั้นตอน Fetch: ดึงไฟล์จาก Cache ก่อน ถ้าไม่มีค่อยขอจาก Network
+// ดักจับการร้องขอข้อมูล และส่งกลับจากแคชหากไม่มีอินเทอร์เน็ต
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    caches.match(event.request)
+      .then((response) => {
+        if (response) {
+          return response; // ส่งข้อมูลจากแคช
+        }
+        // หากไม่มีในแคช ให้ดึงจากเครือข่าย
+        return fetch(event.request).catch(() => {
+          // Fallback: หากออฟไลน์และเป็นการขอหน้าเว็บ ให้ส่ง index.html กลับไป
+          if (event.request.mode === 'navigate') {
+            return caches.match('/index.html');
+          }
+        });
+      })
   );
 });
