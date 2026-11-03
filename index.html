@@ -2,11 +2,14 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>เบอร์โทรฉุกเฉิน Thailand (PWA)</title>
-    <!-- Manifest สำหรับ PWA -->
-    <link rel="manifest" href="manifest.json">
+    <meta name="description" content="แอปรวมเบอร์โทรฉุกเฉินประเทศไทย พร้อมระบบระบุตำแหน่ง GPS">
     <meta name="theme-color" content="#dc2626">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23dc2626'/%3E%3Ctext x='50' y='65' font-size='50' text-anchor='middle' fill='white'%3E📞%3C/text%3E%3C/svg%3E">
     
     <!-- External Resources -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,97 +17,88 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
 <body class="pb-12">
 
     <!-- Header & Search -->
-    <header class="bg-red-600 text-white py-6 px-4 shadow-lg sticky top-0 z-50">
+    <header class="bg-red-600 text-white py-6 px-4 shadow-lg sticky top-0 z-40">
         <div class="max-w-3xl mx-auto text-center">
             <h1 class="text-2xl font-bold flex items-center justify-center gap-2">
-                <i class="fa-solid fa-phone-volume animate-pulse"></i> เบอร์โทรฉุกเฉิน Thailand
+                <i class="fa-solid fa-phone-volume animate-pulse-slow"></i> เบอร์โทรฉุกเฉิน Thailand
             </h1>
             <p class="text-red-100 text-xs mt-1">กดโทรออกได้ทันที รองรับการทำงานออฟไลน์</p>
             
             <div class="mt-4 relative">
                 <input type="text" id="searchInput" onkeyup="filterContacts()" 
-                       placeholder="ค้นหาบริการฉุกเฉิน..." 
-                       class="w-full py-2 px-10 rounded-full text-gray-800 text-sm focus:outline-none shadow">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3 text-gray-400"></i>
+                       placeholder="ค้นหาบริการฉุกเฉิน (เช่น ตำรวจ, 1669)..." 
+                       class="w-full py-3 px-12 rounded-full text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-red-300 shadow-md">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400"></i>
             </div>
         </div>
     </header>
 
     <main class="max-w-3xl mx-auto px-4 mt-4 space-y-4">
 
-        <!-- 📍 GPS Location Widget (สำคัญมากสำหรับกรณีแจ้งเหตุ) -->
+        <!-- 📍 GPS Location Widget -->
         <section class="bg-white p-4 rounded-xl shadow-sm border border-red-200">
-            <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center justify-between mb-3">
                 <h2 class="font-bold text-gray-800 flex items-center gap-2 text-sm sm:text-base">
                     <i class="fa-solid fa-location-dot text-red-600"></i> ตำแหน่งปัจจุบันของคุณ
                 </h2>
-                <button onclick="getLocation()" class="text-xs bg-red-50 text-red-600 px-3 py-1 rounded-full font-medium hover:bg-red-100 transition">
+                <button onclick="getLocation()" class="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-full font-medium hover:bg-red-100 transition active:scale-95">
                     <i class="fa-solid fa-rotate-right"></i> อัปเดตตำแหน่ง
                 </button>
             </div>
             
-            <!-- แสดงผลพิกัด -->
-            <div id="locationBox" class="bg-gray-50 p-3 rounded-lg text-xs sm:text-sm text-gray-600 space-y-1">
-                <p id="geoStatus">กำลังดึงตำแหน่ง GPS...</p>
+            <div id="locationBox" class="bg-gray-50 p-3 rounded-lg text-xs sm:text-sm text-gray-600 space-y-1 border border-gray-100">
+                <p id="geoStatus" class="text-gray-500">ยังไม่ได้ระบุตำแหน่ง</p>
                 <p id="geoCoords" class="font-mono font-bold text-gray-800 hidden"></p>
             </div>
 
-            <!-- ปุ่มก๊อปปี้ข้อความเพื่อแจ้งเจ้าหน้าที่ -->
-            <button id="copyBtn" onclick="copyLocationText()" class="hidden w-full mt-2 bg-gray-800 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-2 hover:bg-gray-900 transition">
-                <i class="fa-solid fa-copy"></i> คัดลอกพิกัดตำแหน่งเพื่อส่ง/อ่านให้เจ้าหน้าที่
+            <button id="copyBtn" onclick="copyLocationText()" class="hidden w-full mt-3 bg-gray-800 text-white py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-900 active:scale-95 transition shadow-md">
+                <i class="fa-solid fa-copy"></i> คัดลอกพิกัดเพื่อส่งให้เจ้าหน้าที่
             </button>
         </section>
 
-        <!-- Container สำหรับ Render รายการเบอร์โทรจาก JSON -->
-        <div id="contactsContainer" class="space-y-6"></div>
+        <!-- Contacts Container -->
+        <div id="contactsContainer" class="space-y-4"></div>
 
     </main>
 
-    <!-- นำเข้า Logic หลัก -->
-    <script src="app.js"></script>
-    
-<!-- PWA Install Pop-up Modal -->
+    <!-- PWA Install Modal -->
     <div id="pwaInstallModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4 hidden transition-opacity duration-300">
         <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl transform transition-all space-y-4 text-center">
-            
-            <!-- App Icon & Header -->
             <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto text-red-600 text-2xl shadow-inner">
                 <i class="fa-solid fa-phone-volume animate-bounce"></i>
             </div>
-            
             <div>
                 <h3 class="text-lg font-bold text-gray-800">ติดตั้งแอป "ฉุกเฉิน TH"</h3>
-                <p class="text-xs text-gray-500 mt-1">ติดตั้งลงบนมือถือเพื่อกดโทรออกด่วน และเข้าถึงพิกัด GPS ได้แม้น้ำเน็ตหลุด (Offline)</p>
+                <p class="text-xs text-gray-500 mt-1">ติดตั้งลงบนมือถือเพื่อกดโทรออกด่วน และเข้าถึงพิกัด GPS ได้แม้ไม่มีอินเทอร์เน็ต</p>
             </div>
 
-            <!-- คำแนะนำสำหรับ iOS Safari (จะแสดงผลเฉพาะบน iPhone/iPad) -->
             <div id="iosInstallGuide" class="hidden bg-gray-50 p-3 rounded-xl text-left text-xs text-gray-600 space-y-1.5 border border-gray-200">
                 <p class="font-semibold text-gray-800">📲 วิธีติดตั้งบน iPhone / iPad:</p>
                 <ol class="list-decimal list-inside space-y-1">
                     <li>กดปุ่ม <span class="font-bold text-blue-600"><i class="fa-solid fa-share-nodes"></i> แชร์ (Share)</span> ที่แถบ Safari ด้านล่าง</li>
-                    <li>เลื่อนลงมาแล้วเลือก <span class="font-bold text-gray-800"><i class="fa-regular fa-square-plus"></i> เพิ่มไปยังหน้าจอโฮม</span></li>
+                    <li>เลือก <span class="font-bold text-gray-800"><i class="fa-regular fa-square-plus"></i> เพิ่มไปยังหน้าจอโฮม</span></li>
                 </ol>
             </div>
 
-            <!-- ปุ่มดำเนินการสำหรับ Android / Desktop -->
             <div id="androidInstallAction" class="space-y-2">
                 <button onclick="triggerPwaInstall()" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 active:scale-95 transition flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-download"></i> ติดตั้งแอปทันที
                 </button>
             </div>
 
-            <!-- ปุ่มปิด Pop-up -->
             <button onclick="closeInstallModal()" class="text-xs text-gray-400 hover:text-gray-600 underline font-medium">
                 ไว้ทีหลัง / ปิดหน้าต่างนี้
             </button>
         </div>
     </div>
     
+    <script src="app.js"></script>
 </body>
 </html>
