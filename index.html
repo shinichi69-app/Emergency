@@ -2,23 +2,13 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>เบอร์โทรฉุกเฉิน Thailand (PWA)</title>
-    <meta name="description" content="แอปรวมเบอร์โทรฉุกเฉินประเทศไทย พร้อมระบบระบุตำแหน่ง GPS">
-    <meta name="theme-color" content="#dc2626">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23dc2626'/%3E%3Ctext x='50' y='65' font-size='50' text-anchor='middle' fill='white'%3E📞%3C/text%3E%3C/svg%3E">
-    
-    <!-- External Resources -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เบอร์โทรฉุกเฉิน Thailand</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
-        .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
 <body class="pb-12">
@@ -27,7 +17,7 @@
     <header class="bg-red-600 text-white py-6 px-4 shadow-lg sticky top-0 z-40">
         <div class="max-w-3xl mx-auto text-center">
             <h1 class="text-2xl font-bold flex items-center justify-center gap-2">
-                <i class="fa-solid fa-phone-volume animate-pulse-slow"></i> เบอร์โทรฉุกเฉิน Thailand
+                <i class="fa-solid fa-phone-volume animate-pulse"></i> เบอร์โทรฉุกเฉิน Thailand
             </h1>
             <p class="text-red-100 text-xs mt-1">กดโทรออกได้ทันที รองรับการทำงานออฟไลน์</p>
             
@@ -42,13 +32,13 @@
 
     <main class="max-w-3xl mx-auto px-4 mt-4 space-y-4">
 
-        <!-- 📍 GPS Location Widget -->
+        <!-- GPS Location Widget -->
         <section class="bg-white p-4 rounded-xl shadow-sm border border-red-200">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="font-bold text-gray-800 flex items-center gap-2 text-sm sm:text-base">
+                <h2 class="font-bold text-gray-800 flex items-center gap-2 text-sm">
                     <i class="fa-solid fa-location-dot text-red-600"></i> ตำแหน่งปัจจุบันของคุณ
                 </h2>
-                <button onclick="getLocation()" class="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-full font-medium hover:bg-red-100 transition active:scale-95">
+                <button onclick="getLocation()" class="text-xs bg-red-50 text-red-600 px-3 py-1.5 rounded-full font-medium hover:bg-red-100 transition">
                     <i class="fa-solid fa-rotate-right"></i> อัปเดตตำแหน่ง
                 </button>
             </div>
@@ -58,7 +48,7 @@
                 <p id="geoCoords" class="font-mono font-bold text-gray-800 hidden"></p>
             </div>
 
-            <button id="copyBtn" onclick="copyLocationText()" class="hidden w-full mt-3 bg-gray-800 text-white py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-900 active:scale-95 transition shadow-md">
+            <button id="copyBtn" onclick="copyLocationText()" class="hidden w-full mt-3 bg-gray-800 text-white py-3 rounded-lg text-sm font-medium flex items-center justify-center gap-2 hover:bg-gray-900 transition">
                 <i class="fa-solid fa-copy"></i> คัดลอกพิกัดเพื่อส่งให้เจ้าหน้าที่
             </button>
         </section>
@@ -68,37 +58,187 @@
 
     </main>
 
-    <!-- PWA Install Modal -->
-    <div id="pwaInstallModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4 hidden transition-opacity duration-300">
-        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl transform transition-all space-y-4 text-center">
-            <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto text-red-600 text-2xl shadow-inner">
-                <i class="fa-solid fa-phone-volume animate-bounce"></i>
+    <!-- Call Confirm Modal -->
+    <div id="callConfirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto text-red-600 text-3xl animate-pulse">
+                <i class="fa-solid fa-phone"></i>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-gray-800">ติดตั้งแอป "ฉุกเฉิน TH"</h3>
-                <p class="text-xs text-gray-500 mt-1">ติดตั้งลงบนมือถือเพื่อกดโทรออกด่วน และเข้าถึงพิกัด GPS ได้แม้ไม่มีอินเทอร์เน็ต</p>
+                <h3 class="text-lg font-bold text-gray-800">ยืนยันการโทรออก</h3>
+                <p class="text-sm text-gray-500 mt-1">คุณกำลังจะติดต่อไปยัง</p>
+                <p id="confirmName" class="text-xl font-bold text-red-600 mt-1">-</p>
+                <p id="confirmNumber" class="text-2xl font-mono font-bold text-gray-800">-</p>
             </div>
-
-            <div id="iosInstallGuide" class="hidden bg-gray-50 p-3 rounded-xl text-left text-xs text-gray-600 space-y-1.5 border border-gray-200">
-                <p class="font-semibold text-gray-800">📲 วิธีติดตั้งบน iPhone / iPad:</p>
-                <ol class="list-decimal list-inside space-y-1">
-                    <li>กดปุ่ม <span class="font-bold text-blue-600"><i class="fa-solid fa-share-nodes"></i> แชร์ (Share)</span> ที่แถบ Safari ด้านล่าง</li>
-                    <li>เลือก <span class="font-bold text-gray-800"><i class="fa-regular fa-square-plus"></i> เพิ่มไปยังหน้าจอโฮม</span></li>
-                </ol>
-            </div>
-
-            <div id="androidInstallAction" class="space-y-2">
-                <button onclick="triggerPwaInstall()" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 active:scale-95 transition flex items-center justify-center gap-2 text-sm">
-                    <i class="fa-solid fa-download"></i> ติดตั้งแอปทันที
+            
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="closeCallModal()" class="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-200 transition">
+                    ยกเลิก
+                </button>
+                <button onclick="executeCall()" class="w-full bg-red-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-red-700 transition">
+                    <i class="fa-solid fa-phone"></i> โทรเลย
                 </button>
             </div>
-
-            <button onclick="closeInstallModal()" class="text-xs text-gray-400 hover:text-gray-600 underline font-medium">
-                ไว้ทีหลัง / ปิดหน้าต่างนี้
-            </button>
         </div>
     </div>
-    
-    <script src="app.js"></script>
+
+    <script>
+        // ฐานข้อมูลเบอร์โทรฉุกเฉิน
+        const emergencyContacts = [
+            { category: "🚨 เหตุด่วนเหตุร้าย", items: [
+                { name: "ตำรวจ (แจ้งเหตุฉุกเฉิน)", number: "191", desc: "แจ้งเหตุด่วน เหตุร้าย อุบัติเหตุทุกประเภท" },
+                { name: "ตำรวจท่องเที่ยว", number: "1155", desc: "สำหรับนักท่องเที่ยว ต้องการความช่วยเหลือ" },
+                { name: "ตำรวจทางหลวง", number: "1193", desc: "แจ้งเหตุบนทางหลวง สายหลักทั่วประเทศ" },
+                { name: "แจ้งรถหาย", number: "1192", desc: "แจ้งรถหาย หรือถูกขโมยทรัพย์สิน" },
+                { name: "ตำรวจไซเบอร์", number: "1441", desc: "แจ้งความผิดทางคอมพิวเตอร์" }
+            ]},
+            { category: "🚑 การแพทย์และสุขภาพ", items: [
+                { name: "สถาบันการแพทย์ฉุกเฉิน (EMS)", number: "1669", desc: "เจ็บป่วยฉุกเฉิน ต้องการรถพยาบาล" },
+                { name: "โรงพยาบาลตำรวจ", number: "1691", desc: "สายด่วนโรงพยาบาลตำรวจ" },
+                { name: "สายด่วนสุขภาพจิต", number: "1667", desc: "ปรึกษาปัญหาสุขภาพจิต" },
+                { name: "หน่วยแพทย์ฉุกเฉิน กทม.", number: "1646", desc: "บริการการแพทย์ฉุกเฉิน กทม." }
+            ]},
+            { category: "🚒 ดับเพลิงและกู้ภัย", items: [
+                { name: "ดับเพลิงและกู้ภัย", number: "199", desc: "แจ้งเหตุไฟไหม้ สาธารณภัย" },
+                { name: "กรมป้องกันและบรรเทาสาธารณภัย", number: "1784", desc: "ประสานงานสาธารณภัยต่างๆ" }
+            ]},
+            { category: "🛣️ การเดินทาง", items: [
+                { name: "สายด่วนกรมทางหลวง", number: "1586", desc: "แจ้งเหตุบนทางหลวงแผ่นดิน" },
+                { name: "การทางพิเศษแห่งประเทศไทย", number: "1543", desc: "แจ้งเหตุบนทางด่วน" },
+                { name: "ศูนย์ช่วยเหลือทางน้ำ", number: "1196", desc: "แจ้งเหตุฉุกเฉินทางน้ำ" }
+            ]},
+            { category: "🤝 ความช่วยเหลือสังคม", items: [
+                { name: "ศูนย์ช่วยเหลือสังคม", number: "1300", desc: "แจ้งคนหาย ความรุนแรงในครอบครัว" },
+                { name: "ศูนย์บริการข้อมูลภาครัฐ", number: "1111", desc: "ร้องเรียน ร้องทุกข์ หน่วยงานรัฐ" }
+            ]}
+        ];
+
+        let currentLocation = null;
+
+        // ฟังก์ชันแสดงผลรายการเบอร์โทร
+        function renderContacts(filterText = '') {
+            const container = document.getElementById('contactsContainer');
+            container.innerHTML = '';
+            const lowerFilter = filterText.toLowerCase().trim();
+
+            emergencyContacts.forEach(cat => {
+                const filteredItems = cat.items.filter(item => 
+                    item.name.toLowerCase().includes(lowerFilter) || 
+                    item.number.includes(lowerFilter) ||
+                    item.desc.toLowerCase().includes(lowerFilter)
+                );
+
+                if (filteredItems.length > 0) {
+                    const section = document.createElement('div');
+                    section.className = 'bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden';
+                    
+                    let itemsHtml = '';
+                    filteredItems.forEach(item => {
+                        itemsHtml += `
+                            <div class="flex items-center justify-between p-4 hover:bg-red-50 transition border-b border-gray-50 last:border-0">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-gray-800">${item.name}</span>
+                                        <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">${item.number}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mt-1">${item.desc}</p>
+                                </div>
+                                <button onclick="showCallConfirm('${item.name}', '${item.number}')" 
+                                        class="w-12 h-12 bg-red-600 text-white rounded-full flex items-center justify-center shadow-md hover:scale-110 transition">
+                                    <i class="fa-solid fa-phone"></i>
+                                </button>
+                            </div>
+                        `;
+                    });
+
+                    section.innerHTML = `
+                        <div class="bg-gray-50 px-4 py-3 border-b border-gray-100">
+                            <h3 class="font-bold text-gray-700 text-sm">${cat.category}</h3>
+                        </div>
+                        <div>${itemsHtml}</div>
+                    `;
+                    container.appendChild(section);
+                }
+            });
+
+            if (container.innerHTML === '') {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-gray-500 bg-white rounded-xl border border-gray-100">
+                        <i class="fa-solid fa-magnifying-glass text-3xl mb-3 text-gray-300"></i>
+                        <p>ไม่พบข้อมูลที่คุณค้นหา</p>
+                    </div>
+                `;
+            }
+        }
+
+        function filterContacts() {
+            const searchText = document.getElementById('searchInput').value;
+            renderContacts(searchText);
+        }
+
+        // ฟังก์ชันยืนยันการโทร
+        function showCallConfirm(name, number) {
+            document.getElementById('confirmName').textContent = name;
+            document.getElementById('confirmNumber').textContent = number;
+            document.getElementById('callConfirmModal').classList.remove('hidden');
+        }
+
+        function closeCallModal() {
+            document.getElementById('callConfirmModal').classList.add('hidden');
+        }
+
+        function executeCall() {
+            const number = document.getElementById('confirmNumber').textContent;
+            window.location.href = `tel:${number}`;
+            closeCallModal();
+        }
+
+        // ฟังก์ชัน GPS
+        function getLocation() {
+            const statusEl = document.getElementById('geoStatus');
+            const coordsEl = document.getElementById('geoCoords');
+            const copyBtn = document.getElementById('copyBtn');
+
+            statusEl.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> กำลังดึงข้อมูล...";
+            statusEl.className = "text-yellow-600 font-medium";
+
+            if (!navigator.geolocation) {
+                statusEl.textContent = "⚠️ เบราว์เซอร์ไม่รองรับ";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    currentLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    statusEl.innerHTML = "✅ ระบุตำแหน่งสำเร็จ";
+                    statusEl.className = "text-green-600 font-medium";
+                    coordsEl.textContent = `ละติจูด: ${currentLocation.lat.toFixed(6)}, ลองจิจูด: ${currentLocation.lng.toFixed(6)}`;
+                    coordsEl.classList.remove('hidden');
+                    copyBtn.classList.remove('hidden');
+                },
+                (error) => {
+                    statusEl.textContent = "️ ไม่สามารถระบุตำแหน่งได้";
+                    statusEl.className = "text-red-600 font-medium";
+                }
+            );
+        }
+
+        function copyLocationText() {
+            if (!currentLocation) return;
+            const textToCopy = `📍 ตำแหน่ง: ${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}\nhttps://www.google.com/maps?q=${currentLocation.lat},${currentLocation.lng}`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('คัดลอกสำเร็จ!');
+            });
+        }
+
+        // เริ่มต้นทำงานเมื่อโหลดหน้าเว็บ
+        document.addEventListener('DOMContentLoaded', () => {
+            renderContacts();
+            console.log('App loaded successfully');
+        });
+    </script>
 </body>
 </html>
